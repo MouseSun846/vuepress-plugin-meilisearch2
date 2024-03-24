@@ -43,7 +43,7 @@
 import { ref, watch } from 'vue';
 import { MeiliSearch } from 'meilisearch'
 // import keywordMark from 'keyword-mark';
-import { currentIndex, modalVisible, query, hits, canHide } from '../global.js';
+import { currentIndex, modalVisible, query, hits, canHide} from '../global.js';
 import { pluginOptions } from '../define.js';
 
 const client = new MeiliSearch({
@@ -54,8 +54,29 @@ const client = new MeiliSearch({
 const index = ref(pluginOptions.INDEX);
 const modalEl = ref<HTMLDivElement>();
 
+
 const handleChange = async () => {
+  const courseList =  JSON.parse(localStorage.getItem('courseInfo'))
+  if(!courseList) {
+    hits.value = null
+    return
+  }
+  
   const result = await client.index(index.value).search(query.value, { limit: 5 });
+  for(let i = 0; i < result.hits.length; i) {
+    let isExisted = false;
+    for(let j = 0; j<courseList.length;j++) {
+      if(courseList[j]?.indexOf(result.hits[i]?.url) !== -1 || result.hits[i]?.url.indexOf(courseList[j]) !== -1) {
+        isExisted = true;
+        break;
+      }
+    }
+    if(!isExisted) {
+        result.hits.splice(i, 1);
+      } else {
+        i++;
+      }
+  }
   hits.value = result.hits;
 }
 
