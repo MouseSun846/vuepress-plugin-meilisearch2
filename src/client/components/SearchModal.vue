@@ -66,7 +66,9 @@ const handleChange = async () => {
   for(let i = 0; i < result.hits.length; i) {
     let isExisted = false;
     for(let j = 0; j<courseList.length;j++) {
-      if(courseList[j]?.indexOf(result.hits[i]?.url) !== -1 || result.hits[i]?.url.indexOf(courseList[j]) !== -1) {
+      const dest = decodeURI(result.hits[i]?.url);
+      const src = decodeURI(courseList[j]);
+      if(src.indexOf(dest) !== -1 || dest.indexOf(src) !== -1) {
         isExisted = true;
         break;
       }
